@@ -1,9 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { unlink } from 'fs';
 import { PrismaService } from 'nestjs-prisma';
-import { join } from 'path';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
 
@@ -81,16 +79,10 @@ export class QuestionService {
     filename?: string,
   ) {
     try {
-      const oldQuestion = await this.prisma.question.findUnique({
-        where: { id },
-      });
       const newQuestion = await this.prisma.question.update({
         where: { id },
         data: { ...updateQuestionDto, image: filename },
       });
-      if (oldQuestion.image) {
-        unlink(join(process.cwd(), '/static', oldQuestion.image), () => {});
-      }
       return newQuestion;
     } catch (e) {
       if (
